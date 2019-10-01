@@ -40,11 +40,11 @@ SET default_with_oids = false;
 CREATE TABLE public.organization (
     organization_id integer NOT NULL,
     organization_name character varying(50) NOT NULL,
-    t_eff_start date NOT NULL,
-    t_reg_start date NOT NULL,
-    t_eff_end date NOT NULL,
-    t_reg_end date NOT NULL,
-    t_deletion date NOT NULL
+    t_eff_start date,
+    t_reg_start date,
+    t_eff_end date,
+    t_reg_end date,
+    t_deletion date
 );
 
 
@@ -79,11 +79,11 @@ CREATE TABLE public.renting (
     rent_id integer NOT NULL,
     room_id integer NOT NULL,
     organization_id integer NOT NULL,
-    t_eff_start date NOT NULL,
-    t_reg_start date NOT NULL,
-    t_eff_end date NOT NULL,
-    t_reg_end date NOT NULL,
-    t_deletion date NOT NULL
+    t_eff_start date,
+    t_reg_start date,
+    t_eff_end date,
+    t_reg_end date,
+    t_deletion date
 );
 
 
@@ -117,11 +117,11 @@ ALTER SEQUENCE public.renting_rent_id_seq OWNED BY public.renting.rent_id;
 CREATE TABLE public.room (
     room_id integer NOT NULL,
     room_name character varying(50) NOT NULL,
-    t_eff_start date NOT NULL,
-    t_reg_start date NOT NULL,
-    t_eff_end date NOT NULL,
-    t_reg_end date NOT NULL,
-    t_deletion date NOT NULL
+    t_eff_start date,
+    t_reg_start date,
+    t_eff_end date,
+    t_reg_end date,
+    t_deletion date
 );
 
 
@@ -174,6 +174,10 @@ ALTER TABLE ONLY public.room ALTER COLUMN room_id SET DEFAULT nextval('public.ro
 --
 
 COPY public.organization (organization_id, organization_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) FROM stdin;
+1	HMIF	2018-11-10	2018-11-11	\N	\N	\N
+2	IMT	2018-02-14	2018-02-14	\N	\N	\N
+3	HME	2018-05-03	2018-05-04	\N	\N	\N
+4	KM ITB	2018-01-12	2018-01-13	\N	\N	\N
 \.
 
 
@@ -181,7 +185,7 @@ COPY public.organization (organization_id, organization_name, t_eff_start, t_reg
 -- Name: organization_organization_id_seq; Type: SEQUENCE SET; Schema: public; Owner: niraramadhani
 --
 
-SELECT pg_catalog.setval('public.organization_organization_id_seq', 1, false);
+SELECT pg_catalog.setval('public.organization_organization_id_seq', 4, true);
 
 
 --
@@ -204,6 +208,11 @@ SELECT pg_catalog.setval('public.renting_rent_id_seq', 1, false);
 --
 
 COPY public.room (room_id, room_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) FROM stdin;
+2	Programming	2018-02-05	2018-02-07	\N	\N	\N
+4	Auditorium 2	2018-09-03	2018-09-05	\N	\N	\N
+5	Multimedia	2018-10-12	2018-10-14	\N	\N	\N
+1	Informatika Dasar	2018-01-18	2018-01-20	\N	\N	\N
+3	Auditorium 1	2018-06-15	2018-06-17	2019-02-03	2019-01-03	\N
 \.
 
 
@@ -211,15 +220,7 @@ COPY public.room (room_id, room_name, t_eff_start, t_reg_start, t_eff_end, t_reg
 -- Name: room_room_id_seq; Type: SEQUENCE SET; Schema: public; Owner: niraramadhani
 --
 
-SELECT pg_catalog.setval('public.room_room_id_seq', 1, false);
-
-
---
--- Name: organization organization_organization_name_key; Type: CONSTRAINT; Schema: public; Owner: niraramadhani
---
-
-ALTER TABLE ONLY public.organization
-    ADD CONSTRAINT organization_organization_name_key UNIQUE (organization_name);
+SELECT pg_catalog.setval('public.room_room_id_seq', 5, true);
 
 
 --
@@ -244,14 +245,6 @@ ALTER TABLE ONLY public.renting
 
 ALTER TABLE ONLY public.room
     ADD CONSTRAINT room_pkey PRIMARY KEY (room_id);
-
-
---
--- Name: room room_room_name_key; Type: CONSTRAINT; Schema: public; Owner: niraramadhani
---
-
-ALTER TABLE ONLY public.room
-    ADD CONSTRAINT room_room_name_key UNIQUE (room_name);
 
 
 --
