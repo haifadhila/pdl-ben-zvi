@@ -16,187 +16,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: organization_transaction_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.organization_transaction_time_slice(chosen_date date) RETURNS TABLE(organization_id integer, organization_name character varying, t_eff_start date, t_eff_end date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-	   o.organization_id,
-	   o.organization_name,
-	   o.t_eff_start,
-	   o.t_eff_end
-   FROM
-      organization o
-   WHERE
-      o.t_reg_start <= chosen_date AND (o.t_deletion >= chosen_date OR o.t_deletion is NULL);
-END; $$;
-
-
-ALTER FUNCTION public.organization_transaction_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: organization_valid_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.organization_valid_time_slice(chosen_date date) RETURNS TABLE(organization_id integer, organization_name character varying, t_reg_start date, t_reg_end date, t_deletion date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-	   o.organization_id,
-	   o.organization_name,
-	   o.t_reg_start,
-	   o.t_reg_end,
-	   o.t_deletion 
-   FROM
-      organization o
-   WHERE
-      o.t_eff_start <= chosen_date AND (o.t_eff_end >= chosen_date OR o.t_eff_end is null);
-END; $$;
-
-
-ALTER FUNCTION public.organization_valid_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: renting_transaction_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.renting_transaction_time_slice(chosen_date date) RETURNS TABLE(rent_id integer, room_id integer, organization_id integer, event_name character varying, t_eff_start date, t_eff_end date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-       r.rent_id,
-	   r.room_id,
-	   r.organization_id,
-	   r.event_name,
-	   r.t_eff_start,
-	   r.t_eff_end
-   FROM
-      renting r
-   WHERE
-       r.t_reg_start <= chosen_date AND (r.t_deletion >= chosen_date OR r.t_deletion is NULL);
-END; $$;
-
-
-ALTER FUNCTION public.renting_transaction_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: renting_valid_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.renting_valid_time_slice(chosen_date date) RETURNS TABLE(rent_id integer, room_id integer, organization_id integer, event_name character varying, t_reg_start date, t_reg_end date, t_deletion date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-       r.rent_id,
-	   r.room_id,
-	   r.organization_id,
-	   r.event_name,
-	   r.t_reg_start,
-	   r.t_reg_end,
-	   r.t_deletion 
-   FROM
-      renting r
-   WHERE
-   	r.t_eff_start <= chosen_date AND (r.t_eff_end >= chosen_date OR r.t_eff_end is null);
-END; $$;
-
-
-ALTER FUNCTION public.renting_valid_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: room_transaction_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.room_transaction_time_slice(chosen_date date) RETURNS TABLE(room_id integer, room_name character varying, t_eff_start date, t_eff_end date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-	   r.room_id,
-	   r.room_name,
-	   r.t_eff_start,
-	   r.t_eff_end
-   FROM
-      room r
-   WHERE
-      r.t_reg_start <= chosen_date AND (r.t_deletion >= chosen_date OR r.t_deletion is NULL) ;
-END; $$;
-
-
-ALTER FUNCTION public.room_transaction_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: room_valid_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.room_valid_time_slice(chosen_date date) RETURNS TABLE(room_id integer, room_name character varying, t_reg_start date, t_reg_end date, t_deletion date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-	   r.room_id,
-	   r.room_name,
-	   r.t_reg_start,
-	   r.t_reg_end,
-	   r.t_deletion 
-   FROM
-      room r
-   WHERE
-      r.t_eff_start <= chosen_date AND (r.t_eff_end >= chosen_date OR r.t_eff_end is null);
-END; $$;
-
-
-ALTER FUNCTION public.room_valid_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: valid_time_slice(date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.valid_time_slice(chosen_date date) RETURNS TABLE(rent_id integer, room_id integer, organization_id integer, event_name character varying, t_reg_start date, t_reg_end date, t_deletion date)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   RETURN QUERY SELECT
-       r.rent_id,
-	   r.room_id,
-	   r.organization_id,
-	   r.event_name,
-	   r.t_reg_start,
-	   r.t_reg_end,
-	   r.t_deletion 
-   FROM
-      renting r
-   WHERE
-      t_eff_start <= chosen_date AND t_eff_end >= chosen_date;
-END; $$;
-
-
-ALTER FUNCTION public.valid_time_slice(chosen_date date) OWNER TO haifadhila;
-
---
--- Name: valid_time_slice(character varying, date); Type: FUNCTION; Schema: public; Owner: haifadhila
---
-
-CREATE FUNCTION public.valid_time_slice(table_name character varying, chosen_date date) RETURNS void
-    LANGUAGE plpgsql
-    AS $$
-	BEGIN
-		if (table_name = 'room') then
-			SELECT * FROM room_valid_time_slice(chosen_date);
-		end if;
-    END;
-$$;
-
-
-ALTER FUNCTION public.valid_time_slice(table_name character varying, chosen_date date) OWNER TO haifadhila;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -216,7 +35,7 @@ CREATE TABLE public.organization (
 );
 
 
-ALTER TABLE public.organization OWNER TO haifadhila;
+-- ALTER TABLE public.organization OWNER TO haifadhila;
 
 --
 -- Name: organization_organization_id_seq; Type: SEQUENCE; Schema: public; Owner: haifadhila
@@ -230,7 +49,7 @@ CREATE SEQUENCE public.organization_organization_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.organization_organization_id_seq OWNER TO haifadhila;
+-- ALTER TABLE public.organization_organization_id_seq OWNER TO haifadhila;
 
 --
 -- Name: organization_organization_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: haifadhila
@@ -256,7 +75,7 @@ CREATE TABLE public.renting (
 );
 
 
-ALTER TABLE public.renting OWNER TO haifadhila;
+-- ALTER TABLE public.renting OWNER TO haifadhila;
 
 --
 -- Name: renting_rent_id_seq; Type: SEQUENCE; Schema: public; Owner: haifadhila
@@ -271,7 +90,7 @@ CREATE SEQUENCE public.renting_rent_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.renting_rent_id_seq OWNER TO haifadhila;
+-- ALTER TABLE public.renting_rent_id_seq OWNER TO haifadhila;
 
 --
 -- Name: renting_rent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: haifadhila
@@ -295,7 +114,7 @@ CREATE TABLE public.room (
 );
 
 
-ALTER TABLE public.room OWNER TO haifadhila;
+-- ALTER TABLE public.room OWNER TO haifadhila;
 
 --
 -- Name: room_room_id_seq; Type: SEQUENCE; Schema: public; Owner: haifadhila
@@ -309,7 +128,7 @@ CREATE SEQUENCE public.room_room_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.room_room_id_seq OWNER TO haifadhila;
+-- ALTER TABLE public.room_room_id_seq OWNER TO haifadhila;
 
 --
 -- Name: room_room_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: haifadhila
@@ -343,38 +162,35 @@ ALTER TABLE ONLY public.room ALTER COLUMN room_id SET DEFAULT nextval('public.ro
 -- Data for Name: organization; Type: TABLE DATA; Schema: public; Owner: haifadhila
 --
 
-COPY public.organization (organization_id, organization_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) FROM stdin;
-1	HMIF	2018-11-10	2018-11-11	\N	\N	\N
-2	IMT	2018-02-14	2018-02-14	\N	\N	\N
-3	HME	2018-05-03	2018-05-04	\N	\N	\N
-4	KM ITB	2018-01-12	2018-01-13	\N	\N	\N
-\.
+INSERT INTO public.organization (organization_id, organization_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) VALUES
+(1, 'HMIF', '2018-11-10', '2018-11-11', NULL, NULL, NULL),
+(2, 'IMT', '2018-02-14', '2018-02-14', NULL, NULL, NULL),
+(3, 'HME', '2018-05-03', '2018-05-04', NULL, NULL, NULL),
+(4, 'KM ITB', '2018-01-12', '2018-01-13', NULL, NULL, NULL);
 
 
 --
 -- Data for Name: renting; Type: TABLE DATA; Schema: public; Owner: haifadhila
 --
 
-COPY public.renting (rent_id, room_id, organization_id, event_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) FROM stdin;
-1	1	1	Rapat Awal Semester	2019-08-19	2019-08-15	2019-08-20	2019-08-15	\N
-2	5	4	Rakor Kabinet	2019-08-23	2019-08-19	2019-08-23	2019-08-19	\N
-4	4	3	Pelatihan Lomba	2019-09-01	2019-09-06	2019-09-15	2019-09-06	\N
-5	2	2	LPJ Himpunan	2019-09-06	2019-09-01	\N	\N	\N
-3	4	3	Pelatihan Lomba	2019-09-01	2019-08-23	2019-09-07	2019-08-23	2019-09-06
-\.
+INSERT INTO public.renting (rent_id, room_id, organization_id, event_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) VALUES
+(1, 1, 1, 'Rapat Awal Semester', '2019-08-19', '2019-08-15', '2019-08-20', '2019-08-15', NULL),
+(2, 5, 4, 'Rakor Kabinet', '2019-08-23', '2019-08-19', '2019-08-23', '2019-08-19', NULL),
+(4, 4, 3, 'Pelatihan Lomba', '2019-09-01', '2019-09-06', '2019-09-15', '2019-09-06', NULL),
+(5, 2, 2, 'LPJ Himpunan', '2019-09-06', '2019-09-01', NULL, NULL, NULL),
+(3, 4, 3, 'Pelatihan Lomba', '2019-09-01', '2019-08-23', '2019-09-07', '2019-08-23', '2019-09-06');
 
 
 --
 -- Data for Name: room; Type: TABLE DATA; Schema: public; Owner: haifadhila
 --
 
-COPY public.room (room_id, room_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) FROM stdin;
-2	Programming	2018-02-05	2018-02-07	\N	\N	\N
-4	Auditorium 2	2018-09-03	2018-09-05	\N	\N	\N
-5	Multimedia	2018-10-12	2018-10-14	\N	\N	\N
-1	Informatika Dasar	2018-01-18	2018-01-20	\N	\N	\N
-3	Auditorium 1	2018-06-15	2018-06-17	2019-02-03	2019-01-03	\N
-\.
+INSERT INTO public.room (room_id, room_name, t_eff_start, t_reg_start, t_eff_end, t_reg_end, t_deletion) VALUES
+(2, 'Programming', '2018-02-05', '2018-02-07', NULL, NULL, NULL),
+(4, 'Auditorium 2', '2018-09-03', '2018-09-05', NULL, NULL, NULL),
+(5, 'Multimedia', '2018-10-12', '2018-10-14', NULL, NULL, NULL),
+(1, 'Informatika Dasar', '2018-01-18', '2018-01-20', NULL, NULL, NULL),
+(3, 'Auditorium 1', '2018-06-15', '2018-06-17', '2019-02-03', '2019-01-03', NULL);
 
 
 --
