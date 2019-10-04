@@ -50,4 +50,12 @@ SELECT * FROM allen_is_overlapping_inverse('2019-09-01', '2019-09-15', '2019-09-
 SELECT * FROM allen_is_start('2019-09-01', '2019-09-15', '2019-09-06', '2019-09-08');
 SELECT * FROM allen_is_start_inverse('2019-09-01', '2019-09-15', '2019-09-06', '2019-09-08');
 
+-- INSERT
+SELECT insert_into_room('Aula', '2018-11-01',’2019-10-04’);
+
+-- DELETE
+SELECT delete_from_table('Room', 6);
+
+-- UPDATE
+SELECT update_room('t_eff_end', 2, '2019-12-19');
 
