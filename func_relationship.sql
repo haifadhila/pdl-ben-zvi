@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_before(start_date1 date, end_date1 da
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (end_date1 < start_date2);
+   RETURN (end_date1 IS NOT NULL) AND (end_date1 < start_date2);
 END; $$;
 
 -- A after B
@@ -15,7 +15,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_after(start_date1 date, end_date1 dat
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (end_date2 < start_date1);
+   RETURN (end_date2 IS NOT NULL) AND (end_date2 < start_date1);
 END; $$;
 
 -- A meet B
@@ -25,7 +25,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_meet(start_date1 date, end_date1 date
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (end_date1 == start_date2);
+   RETURN (end_date1 IS NOT NULL) AND (end_date1 == start_date2);
 END; $$;
 
 -- A meet inverse B
@@ -35,7 +35,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_meet_inverse(start_date1 date, end_da
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (end_date2 == start_date1);
+   RETURN (end_date2 IS NOT NULL) AND (end_date2 == start_date1);
 END; $$;
 
 -- A overlap B
@@ -45,7 +45,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_overlapping(start_date1 date, end_dat
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (start_date1 < start_date2) AND (start_date2 < end_date1) AND (end_date1 < end_date2);
+   RETURN (end_date1 IS NOT NULL) AND (start_date1 < start_date2) AND (start_date2 < end_date1) AND ((end_date1 < end_date2) OR (end_date2 IS NULL));
 END; $$;
 
 -- A overlap inverse B
@@ -55,7 +55,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_overlapping_inverse(start_date1 date,
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (start_date2 < start_date1) AND (start_date1 < end_date2) AND (end_date2 < end_date1);
+   RETURN (end_date2 IS NOT NULL) AND (start_date2 < start_date1) AND (start_date1 < end_date2) AND ((end_date2 < end_date1) OR (end_date1 IS NULL));
 END; $$;
 
 -- A start B
@@ -65,7 +65,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_start(start_date1 date, end_date1 dat
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (start_date1 == start_date2) AND (end_date1 < end_date2);
+   RETURN (end_date1 IS NULL) AND (start_date1 == start_date2) AND ((end_date1 < end_date2) OR (end_date2 IS NULL));
 END; $$;
 
 -- A start inverse B
@@ -75,7 +75,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_start_inverse(start_date1 date, end_d
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (start_date1 == start_date2) AND (end_date2 < end_date1);
+   RETURN (end_date2 IS NULL) AND (start_date2 == start_date1) AND ((end_date2 < end_date1) OR (end_date1 IS NULL));
 END; $$;
 
 -- A during B
@@ -85,7 +85,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_during(start_date1 date, end_date1 da
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (start_date2 < start_date1) AND (end_date1 < end_date2);
+   RETURN (start_date2 < start_date1) AND (end_date1 IS NOT NULL) AND ((end_date1 < end_date2) OR (end_date2 IS NULL));
 END; $$;
 
 -- A during inverse B
@@ -95,7 +95,7 @@ CREATE OR REPLACE FUNCTION public.allen_is_during_inverse(start_date1 date, end_
     LANGUAGE plpgsql
     AS $$
 BEGIN
-   RETURN (start_date1 < start_date2) AND (end_date2 < end_date1);
+   RETURN (start_date1 < start_date2) AND (end_date2 IS NOT NULL) AND ((end_date2 < end_date1) OR (end_date1 IS NULL));
 END; $$;
 
 -- A finish B
